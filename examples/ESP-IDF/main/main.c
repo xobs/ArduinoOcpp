@@ -19,7 +19,7 @@
 /* ArduinoOcpp includes */
 #include <mongoose.h>
 #include <ArduinoOcpp_c.h> //C-facade of ArduinoOcpp
-#include <AOcppMongooseClient_c.h> //WebSocket integration for ESP-IDF
+#include <ArduinoOcppMongooseClient_c.h> //WebSocket integration for ESP-IDF
 
 /* The examples use WiFi configuration that you can set via project configuration menu
 

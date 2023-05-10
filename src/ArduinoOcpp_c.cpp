@@ -346,7 +346,7 @@ void ao_onRemoteStopTransactionRequest(OnOcppMessage onRequest) {
     setOnRemoteStopTransactionReceiveReq(adaptFn(onRequest));
 }
 
-void ao_onResetSendConf(OnOcppMessage onSendConf) {
+void ao_setOnResetSendConf(OnOcppMessage onSendConf) {
     setOnResetSendConf(adaptFn(onSendConf));
 }
 

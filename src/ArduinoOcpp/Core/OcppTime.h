@@ -63,6 +63,7 @@ public:
 
     bool toJsonString(char *out, size_t buffsize) const;
 
+    OcppTimestamp(const OcppTimestamp& rhs) = default;
     OcppTimestamp &operator=(const OcppTimestamp &rhs);
 
     OcppTimestamp &operator+=(int secs);

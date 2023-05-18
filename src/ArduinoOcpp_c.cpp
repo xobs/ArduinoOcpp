@@ -335,7 +335,7 @@ OcppHandle *getOcppHandle() {
 }
 
 void ao_onRemoteStartTransactionSendConf(OnOcppMessage onSendConf) {
-    setOnRemoteStopTransactionSendConf(adaptFn(onSendConf));
+    setOnRemoteStartTransactionSendConf(adaptFn(onSendConf));
 }
 
 void ao_onRemoteStopTransactionSendConf(OnOcppMessage onSendConf) {

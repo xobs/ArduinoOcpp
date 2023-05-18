@@ -127,7 +127,7 @@ OcppEvseState ConnectorStatus::inferenceStatus() {
         }
     }
 
-    AO_DBG_VERBOSE("Cannot infere status");
+    AO_DBG_VERBOSE("Cannot infer status");
     return OcppEvseState::Faulted; //internal error
 }
 

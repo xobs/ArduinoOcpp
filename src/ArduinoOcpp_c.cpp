@@ -5,7 +5,7 @@
 
 ArduinoOcpp::OcppSocket *ocppSocket = nullptr;
 
-void ao_initialize(AOcppSocket *osock,  float V_eff, struct AO_FilesystemOpt fsopt) {
+void ao_initialize(AOcppSocket *osock,  float V_eff, unsigned int num_connectors, struct AO_FilesystemOpt fsopt) {
     if (!osock) {
         AO_DBG_ERR("osock is null");
     }
@@ -14,7 +14,7 @@ void ao_initialize(AOcppSocket *osock,  float V_eff, struct AO_FilesystemOpt fso
 
     ArduinoOcpp::FilesystemOpt adaptFsopt = fsopt;
 
-    OCPP_initialize(*ocppSocket, V_eff, adaptFsopt);
+    OCPP_initialize(*ocppSocket, V_eff, num_connectors, adaptFsopt);
 }
 
 void ao_deinitialize() {

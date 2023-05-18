@@ -35,11 +35,8 @@ OcppSocket *ocppSocket {nullptr};
 OcppEngine *ocppEngine {nullptr};
 std::shared_ptr<FilesystemAdapter> filesystem;
 FilesystemOpt fileSystemOpt {};
+unsigned int numConnectors;
 float voltage_eff {230.f};
-
-#ifndef AO_NUMCONNECTORS
-#define AO_NUMCONNECTORS 2
-#endif
 
 #define OCPP_ID_OF_CP 0
 bool OCPP_booted = false; //if BootNotification succeeded
@@ -52,7 +49,7 @@ using namespace ArduinoOcpp::Facade;
 using namespace ArduinoOcpp::Ocpp16;
 
 #ifndef AO_CUSTOM_WS
-void OCPP_initialize(const char *CS_hostname, uint16_t CS_port, const char *CS_url, float V_eff, ArduinoOcpp::FilesystemOpt fsOpt) {
+void OCPP_initialize(const char *CS_hostname, uint16_t CS_port, const char *CS_url, float V_eff, unsigned int num_connectors, ArduinoOcpp::FilesystemOpt fsOpt) {
     if (ocppEngine) {
         AO_DBG_WARN("Can't be called two times. Either restart ESP, or call OCPP_deinitialize() before");
         return;
@@ -76,11 +73,11 @@ void OCPP_initialize(const char *CS_hostname, uint16_t CS_port, const char *CS_u
     delete ocppSocket;
     ocppSocket = new EspWiFi::OcppClientSocket(webSocket);
 
-    OCPP_initialize(*ocppSocket, V_eff, fsOpt);
+    OCPP_initialize(*ocppSocket, V_eff, num_connectors, fsOpt);
 }
 #endif
 
-void OCPP_initialize(OcppSocket& ocppSocket, float V_eff, ArduinoOcpp::FilesystemOpt fsOpt) {
+void OCPP_initialize(OcppSocket& ocppSocket, float V_eff, unsigned int num_connectors, ArduinoOcpp::FilesystemOpt fsOpt) {
     if (ocppEngine) {
         AO_DBG_WARN("Can't be called two times. To change the credentials, either restart ESP, or call OCPP_deinitialize() before");
         return;
@@ -88,6 +85,9 @@ void OCPP_initialize(OcppSocket& ocppSocket, float V_eff, ArduinoOcpp::Filesyste
 
     voltage_eff = V_eff;
     fileSystemOpt = fsOpt;
+    // Connectors are 1-indexed, with connector 0 as the special "entire device" connector.
+    // Add 1 to the number of connectors on this device to make this line up.
+    numConnectors = num_connectors + 1;
 
 #ifndef AO_DEACTIVATE_FLASH
     filesystem = makeDefaultFilesystemAdapter(fileSystemOpt);
@@ -100,9 +100,9 @@ void OCPP_initialize(OcppSocket& ocppSocket, float V_eff, ArduinoOcpp::Filesyste
     auto& model = ocppEngine->getOcppModel();
 
     model.setTransactionStore(std::unique_ptr<TransactionStore>(
-        new TransactionStore(AO_NUMCONNECTORS, filesystem)));
+        new TransactionStore(numConnectors, filesystem)));
     model.setChargePointStatusService(std::unique_ptr<ChargePointStatusService>(
-        new ChargePointStatusService(*ocppEngine, AO_NUMCONNECTORS)));
+        new ChargePointStatusService(*ocppEngine, numConnectors)));
     model.setHeartbeatService(std::unique_ptr<HeartbeatService>(
         new HeartbeatService(*ocppEngine)));
 
@@ -319,7 +319,7 @@ void setEnergyMeterInput(std::function<float()> energyInput, unsigned int connec
     auto& model = ocppEngine->getOcppModel();
     if (!model.getMeteringService()) {
         model.setMeteringSerivce(std::unique_ptr<MeteringService>(
-            new MeteringService(*ocppEngine, AO_NUMCONNECTORS, filesystem)));
+            new MeteringService(*ocppEngine, numConnectors, filesystem)));
     }
     SampledValueProperties meterProperties;
     meterProperties.setMeasurand("Energy.Active.Import.Register");
@@ -342,7 +342,7 @@ void setPowerMeterInput(std::function<float()> powerInput, unsigned int connecto
     auto& model = ocppEngine->getOcppModel();
     if (!model.getMeteringService()) {
         model.setMeteringSerivce(std::unique_ptr<MeteringService>(
-            new MeteringService(*ocppEngine, AO_NUMCONNECTORS, filesystem)));
+            new MeteringService(*ocppEngine, numConnectors, filesystem)));
     }
     SampledValueProperties meterProperties;
     meterProperties.setMeasurand("Power.Active.Import");
@@ -368,7 +368,7 @@ void setSmartChargingOutput(std::function<void(float)> chargingLimitOutput, unsi
     auto& model = ocppEngine->getOcppModel();
     if (!model.getSmartChargingService()) {
         model.setSmartChargingService(std::unique_ptr<SmartChargingService>(
-            new SmartChargingService(*ocppEngine, 11000.0f, voltage_eff, AO_NUMCONNECTORS, fileSystemOpt))); //default charging limit: 11kW
+            new SmartChargingService(*ocppEngine, 11000.0f, voltage_eff, numConnectors, fileSystemOpt))); //default charging limit: 11kW
     }
     model.getSmartChargingService()->setOnLimitChange(chargingLimitOutput);
 }
@@ -453,7 +453,7 @@ void addMeterValueInput(std::unique_ptr<SampledValueSampler> valueInput, unsigne
     auto& model = ocppEngine->getOcppModel();
     if (!model.getMeteringService()) {
         model.setMeteringSerivce(std::unique_ptr<MeteringService>(
-            new MeteringService(*ocppEngine, AO_NUMCONNECTORS, filesystem)));
+            new MeteringService(*ocppEngine, numConnectors, filesystem)));
     }
     model.getMeteringService()->addMeterValueSampler(connectorId, std::move(valueInput));
 }

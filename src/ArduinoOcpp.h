@@ -45,6 +45,7 @@ void OCPP_initialize(
             uint16_t CS_port,        //e.g. 80
             const char *CS_url,      //e.g. "ws://example.com/steve/websocket/CentralSystemService/charger001"
             float V_eff = 230.f,     //Grid voltage of your country. e.g. 230.f (European voltage)
+            unsigned int num_connectors = 1, //The number of connectors on this unit
             ArduinoOcpp::FilesystemOpt fsOpt = ArduinoOcpp::FilesystemOpt::Use_Mount_FormatOnFail); //If this library should format the flash if necessary. Find further options in ConfigurationOptions.h
 #endif
 
@@ -63,6 +64,7 @@ void OCPP_initialize(
 void OCPP_initialize(
             ArduinoOcpp::OcppSocket& ocppSocket, //WebSocket adapter for ArduinoOcpp
             float V_eff = 230.f,                 //Grid voltage of your country. e.g. 230.f (European voltage)
+            unsigned int num_connectors = 1,     //The number of connectors on this unit
             ArduinoOcpp::FilesystemOpt fsOpt = ArduinoOcpp::FilesystemOpt::Use_Mount_FormatOnFail); //If this library should format the flash if necessary. Find further options in ConfigurationOptions.h
 
 /*

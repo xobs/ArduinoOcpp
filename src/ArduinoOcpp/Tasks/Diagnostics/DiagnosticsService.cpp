@@ -86,7 +86,7 @@ void DiagnosticsService::loop() {
 //timestamps before year 2021 will be treated as "undefined"
 std::string DiagnosticsService::requestDiagnosticsUpload(const std::string &location, int retries, unsigned int retryInterval, OcppTimestamp startTime, OcppTimestamp stopTime) {
     if (onUpload == nullptr) //maybe add further plausibility checks
-        return nullptr;
+        return std::string();
     
     this->location = location;
     this->retries = retries;
